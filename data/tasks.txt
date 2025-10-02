@@ -1,0 +1,5 @@
+8
+2,Fix Segmentation Fault,Debug the memory access error in the realloc logic
+3,Refactor Code,Improve readability and modularity of loadTasks function
+4,Check File I/O,Verify that fopen and fclose are handled safely
+6,Write Unit Tests,Create test cases for task deletion and l
