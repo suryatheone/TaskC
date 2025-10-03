@@ -3,89 +3,84 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdio.h>
-#include <string.h>
-
 Task inputTask() {
-  Task t;
+  Task new_task;
 
-  printf("Enter task name: ");
-  if (fgets(t.name, sizeof(t.name), stdin)) {
-    t.name[strcspn(t.name, "\n")] = 0;
+  printf("  > Enter task name: ");
+  if (fgets(new_task.name, sizeof(new_task.name), stdin)) {
+    new_task.name[strcspn(new_task.name, "\n")] = 0;
   }
 
-  printf("Enter task description: ");
-  if (fgets(t.description, sizeof(t.description), stdin)) {
-    t.description[strcspn(t.description, "\n")] = 0;
+  printf("  > Enter task description: ");
+  if (fgets(new_task.description, sizeof(new_task.description), stdin)) {
+    new_task.description[strcspn(new_task.description, "\n")] = 0;
   }
 
-  return t;
+  return new_task;
 }
 
 int main() {
-
   system("clear");
-  printf("Simple Task Manager\n\n");
+  printf("--- Simple Task Manager ---\n");
 
-  int n = 0;
-
+  int task_count = 0;
   int capacity = 1;
+  int next_id = 1;
 
   Task *tasks = malloc(capacity * sizeof(Task));
 
   if (!tasks) {
-    fprintf(stderr, "Memory alocation failed\n");
+    fprintf(stderr, "Memory allocation failed\n");
     return 1;
   }
 
-  loadTasks(&tasks, &n, &capacity);
+  next_id = loadTasks(&tasks, &task_count, &capacity);
 
   while (1) {
-    char full_input[50];
-    char command_only[16];
-    int idTask = -1;
-    int items_read = 0;
+    char input_buffer[50];
+    char command[16];
+    int task_id_to_delete = -1;
+    int scanned_items = 0;
 
-    printf("Enter command (Add, Del [id], Show, Exit): ");
+    printf("\n> Enter command (Add, Del [id], Show, Exit): ");
 
-    if (fgets(full_input, sizeof(full_input), stdin) == NULL) {
-      printf("Error reading input.\n");
+    if (fgets(input_buffer, sizeof(input_buffer), stdin) == NULL) {
+      printf("\nError reading input.\n");
       break;
     }
 
-    full_input[strcspn(full_input, "\n")] = 0;
+    input_buffer[strcspn(input_buffer, "\n")] = 0;
 
-    items_read = sscanf(full_input, "%15s %d", command_only, &idTask);
+    scanned_items = sscanf(input_buffer, "%15s %d", command, &task_id_to_delete);
 
-    if (items_read >= 1) {
-
-      if (strcmp(command_only, "Add") == 0) {
-        Task t = inputTask();
-        addTask(&tasks, &n, t.name, t.description, &capacity);
-
-      } else if (strcmp(command_only, "Del") == 0) {
-
-        if (items_read == 2) {
-          deleteTask(&tasks, idTask, &n);
+    if (scanned_items >= 1) {
+      if (strcmp(command, "Add") == 0) {
+        Task new_task = inputTask();
+        addTask(&tasks, &task_count, new_task.name, new_task.description,
+                &capacity, &next_id);
+        printf("\nTask added successfully.\n");
+      } else if (strcmp(command, "Del") == 0) {
+        if (scanned_items == 2) {
+          deleteTask(&tasks, task_id_to_delete, &task_count);
         } else {
-          printf("Error: Del command requires task ID (example: Del 5).\n");
+          printf(
+              "\nError: Del command requires a task ID (e.g., Del 5).\n");
         }
-
-      } else if (strcmp(command_only, "Show") == 0) {
-        showTasks(tasks, n);
-
-      } else if (strcmp(command_only, "Exit") == 0) {
-        printf("Exiting program...\n");
+      } else if (strcmp(command, "Show") == 0) {
+        showTasks(tasks, task_count);
+      } else if (strcmp(command, "Exit") == 0) {
+        printf("\nExiting program...\n");
         break;
-
       } else {
-        printf("Unknown command: %s\n", command_only);
+        printf("\nUnknown command: %s\n", command);
       }
     } else {
-      printf("Empty input.\n");
+      printf("\nEmpty input.\n");
     }
   }
 
-  saveTasks(tasks, n);
+  saveTasks(tasks, task_count, next_id);
+  free(tasks);
+  printf("--- Session End ---\n");
   return 0;
 }
