@@ -7,27 +7,28 @@ This is a simple command-line task manager written in C.
 ### Prerequisites
 
 - A C compiler (like `clang` or `gcc`)
-- `make`
+- `cmake`
 
 ### Steps
 
-1.  **Compile the project:**
+1.  **Configure the project:**
     ```sh
-    make
+    cmake -B build
     ```
 
-2.  **Run the application:**
+2.  **Compile the project:**
     ```sh
-    make run
+    cmake --build build
     ```
-    or
+
+3.  **Run the application:**
     ```sh
     ./build/main
     ```
 
-3.  **Clean the build files:**
+4.  **Clean the build files:**
     ```sh
-    make clean
+    rm -rf build
     ```
 
 ## Usage
